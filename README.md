@@ -31,3 +31,8 @@ npx vercel --prod
 ```
 
 Plans persist in `localStorage` only — no backend, no accounts.
+
+
+## License
+
+All Rights Reserved © Menhir Holdings
