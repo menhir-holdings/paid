@@ -1,29 +1,33 @@
 @import "tailwindcss";
 
+/* Plaster / oak / ink paper desk — FOUC matches lemon-cream default theme. */
 :root {
-  --paid-bg: #0d1112;
-  --paid-fg: #f6f8f8;
-  --paid-surface: #1a2428;
-  --paid-bar: #0d1112;
-  --paid-panel: #1a2428;
-  --paid-border: #3e637e;
-  --paid-accent: #46dcf6;
-  --paid-accent-hover: #387ff0;
-  --paid-focus: #387ff0;
-  --paid-muted: #3e637e;
-  --paid-selection: #46dcf67a;
-  --paid-block-0: #46dcf6;
-  --paid-block-1: #387ff0;
-  --paid-block-2: #5ce0c0;
-  --paid-block-3: #f0a848;
-  --paid-block-4: #f06080;
+  --paid-bg: #fffacd;
+  --paid-fg: #361f4f;
+  --paid-surface: #fff8dc;
+  --paid-bar: #fffad1;
+  --paid-panel: #fffae5;
+  --paid-border: #fafad2;
+  --paid-accent: #ffd700;
+  --paid-accent-hover: #8b6914;
+  --paid-focus: #ffd700;
+  --paid-muted: #7a6a1e;
+  --paid-selection: #8b691450;
+  --paid-block-0: #00695c;
+  --paid-block-1: #6a1b9a;
+  --paid-block-2: #7b4fad;
+  --paid-block-3: #5e35b1;
+  --paid-block-4: #8b6914;
+  --paid-radius: 5px;
+  --paid-now: color-mix(in srgb, var(--paid-fg) 82%, var(--paid-accent));
 }
 
 @theme inline {
   --color-background: var(--paid-bg);
   --color-foreground: var(--paid-fg);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-source-sans);
+  --font-serif: var(--font-newsreader);
+  --font-mono: var(--font-source-code);
 }
 
 html,
@@ -35,29 +39,104 @@ body {
 }
 
 body {
-  font-family: var(--font-sans), system-ui, sans-serif;
+  font-family: var(--font-source-sans), "Segoe UI", system-ui, sans-serif;
+  font-size: 15px;
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
 }
 
 ::selection {
   background: var(--paid-selection);
 }
 
+.desk {
+  background:
+    radial-gradient(1200px 500px at 12% -10%, color-mix(in srgb, var(--paid-accent) 9%, transparent), transparent 55%),
+    var(--paid-bg);
+}
+
+.masthead {
+  background: var(--paid-bar);
+  border-bottom: 1px solid color-mix(in srgb, var(--paid-fg) 12%, var(--paid-border));
+}
+
+.wordmark {
+  font-family: var(--font-newsreader), "Palatino Linotype", Palatino, serif;
+  font-size: 1.42rem;
+  font-weight: 560;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  color: var(--paid-fg);
+}
+
+.kicker {
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--paid-muted);
+}
+
+.clock {
+  font-family: var(--font-source-code), ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+  color: var(--paid-fg);
+}
+
+.sheet {
+  background: var(--paid-panel);
+  border: 1px solid color-mix(in srgb, var(--paid-fg) 10%, var(--paid-border));
+  border-radius: var(--paid-radius);
+  box-shadow: 0 1px 0 color-mix(in srgb, var(--paid-fg) 5%, transparent);
+}
+
+.morning-slip {
+  background: color-mix(in srgb, var(--paid-surface) 80%, var(--paid-bg));
+  border: 1px solid color-mix(in srgb, var(--paid-fg) 12%, var(--paid-border));
+  border-radius: var(--paid-radius);
+  box-shadow: 0 1px 0 color-mix(in srgb, var(--paid-fg) 4%, transparent);
+}
+
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
 .theme-cycle-btn {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
   background: var(--paid-surface);
   color: var(--paid-fg);
-  border: 1px solid var(--paid-border);
+  border: 1px solid color-mix(in srgb, var(--paid-fg) 14%, var(--paid-border));
+  border-radius: var(--paid-radius);
+  cursor: pointer;
 }
 
 .theme-cycle-btn:hover {
-  background: color-mix(in srgb, var(--paid-accent) 12%, var(--paid-surface));
-  border-color: var(--paid-focus);
+  border-color: var(--paid-fg);
+}
+
+.theme-swatch {
+  display: block;
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 999px;
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--paid-fg) 20%, transparent);
 }
 
 .theme-select,
 .editor-input {
   background: var(--paid-bg);
   color: var(--paid-fg);
-  border: 1px solid var(--paid-border);
+  border: 1px solid color-mix(in srgb, var(--paid-fg) 14%, var(--paid-border));
+  border-radius: var(--paid-radius);
+  font-family: inherit;
 }
 
 .theme-select:focus,
@@ -67,34 +146,122 @@ body {
   box-shadow: 0 0 0 2px color-mix(in srgb, var(--paid-focus) 35%, transparent);
 }
 
+.morning-note {
+  line-height: 1.5rem;
+  background-color: var(--paid-bg);
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent 1.45rem,
+    color-mix(in srgb, var(--paid-fg) 10%, transparent) 1.45rem,
+    color-mix(in srgb, var(--paid-fg) 10%, transparent) calc(1.45rem + 1px)
+  );
+  background-origin: content-box;
+}
+
 .quick-add-btn {
-  background: color-mix(in srgb, var(--paid-accent) 18%, var(--paid-surface));
+  background: color-mix(in srgb, var(--paid-surface) 70%, var(--paid-bg));
   color: var(--paid-fg);
-  border: 1px solid var(--paid-border);
+  border: 1px solid color-mix(in srgb, var(--paid-fg) 14%, var(--paid-border));
+  border-radius: var(--paid-radius);
+  font-family: var(--font-source-code), ui-monospace, monospace;
+  cursor: pointer;
 }
 
 .quick-add-btn:hover {
-  background: color-mix(in srgb, var(--paid-accent) 30%, var(--paid-surface));
-  border-color: var(--paid-accent);
+  background: color-mix(in srgb, var(--paid-accent) 18%, var(--paid-surface));
+  border-color: var(--paid-accent-hover);
 }
 
 .duration-chip {
   background: var(--paid-bg);
   color: var(--paid-muted);
-  border: 1px solid var(--paid-border);
+  border: 1px solid color-mix(in srgb, var(--paid-fg) 12%, var(--paid-border));
+  border-radius: 3px;
+  cursor: pointer;
 }
 
 .duration-chip:hover {
   color: var(--paid-fg);
-  border-color: var(--paid-accent);
+  border-color: var(--paid-accent-hover);
 }
 
 .time-grid {
-  scrollbar-color: var(--paid-border) transparent;
+  background: color-mix(in srgb, var(--paid-bg) 92%, #fff8f0);
+  border: 1px solid color-mix(in srgb, var(--paid-fg) 12%, var(--paid-border));
+  border-radius: var(--paid-radius);
+  scrollbar-color: color-mix(in srgb, var(--paid-fg) 22%, transparent) transparent;
+}
+
+.time-gutter {
+  background: color-mix(in srgb, var(--paid-surface) 55%, var(--paid-bg));
+  border-right: 1px solid color-mix(in srgb, var(--paid-fg) 12%, var(--paid-border));
+}
+
+.hour-label {
+  font-family: var(--font-source-code), ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: 0.62rem;
+  letter-spacing: 0.02em;
+  color: var(--paid-muted);
+}
+
+.slot-hour {
+  border-top: 1px solid color-mix(in srgb, var(--paid-fg) 13%, transparent);
+}
+
+.slot-half {
+  border-top: 1px dashed color-mix(in srgb, var(--paid-fg) 8%, transparent);
+}
+
+.slot-hint {
+  font-size: 0.62rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.time-block {
+  border-radius: 4px;
+  box-shadow: 0 1px 0 color-mix(in srgb, var(--paid-fg) 6%, transparent);
 }
 
 .time-block .block-accent {
   flex-shrink: 0;
+  width: 3px;
+}
+
+.now-line {
+  color: var(--paid-now);
+}
+
+.now-chip {
+  font-family: var(--font-source-code), ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  line-height: 1;
+  padding: 0.18rem 0.32rem;
+  border-radius: 3px;
+  background: var(--paid-now);
+  color: var(--paid-bg);
+  transform: translateY(-50%);
+}
+
+.now-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 999px;
+  background: var(--paid-now);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--paid-bg) 80%, transparent);
+  transform: translateY(-50%);
+}
+
+.now-rule {
+  height: 1.5px;
+  flex: 1;
+  background: var(--paid-now);
+  transform: translateY(-50%);
 }
 
 .time-grid::-webkit-scrollbar {
@@ -102,6 +269,19 @@ body {
 }
 
 .time-grid::-webkit-scrollbar-thumb {
-  background: var(--paid-border);
+  background: color-mix(in srgb, var(--paid-fg) 22%, transparent);
   border-radius: 4px;
+}
+
+.remove-block {
+  border-radius: var(--paid-radius);
+  border: 1px solid color-mix(in srgb, var(--paid-fg) 14%, var(--paid-border));
+  color: var(--paid-muted);
+  background: transparent;
+  cursor: pointer;
+}
+
+.remove-block:hover {
+  border-color: color-mix(in srgb, #9b1c1c 50%, var(--paid-border));
+  color: #9b1c1c;
 }

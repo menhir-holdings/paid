@@ -4,6 +4,7 @@ Linear: [Paid project](https://linear.app/menhir-holdings/project/paid-7842cd6c-
 
 ## Done
 
+- [MT-206](https://linear.app/menhir-holdings/issue/MT-206) — Day-planner chrome to Menhir web standard (in review)
 - [MT-19](https://linear.app/menhir-holdings/issue/MT-19) — Solo planner happy path (localStorage save/reopen)
 
 ## Open

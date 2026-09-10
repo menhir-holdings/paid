@@ -16,6 +16,37 @@ import {
   totalPlannedMinutes,
 } from "@/lib/planner";
 
+const WEEKDAYS = [
+  "Sunday",
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+];
+const MONTHS = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+];
+
+function dayHeading(iso: string, isToday: boolean): string {
+  const [y, m, d] = iso.split("-").map(Number);
+  const dt = new Date(y, m - 1, d);
+  const label = `${WEEKDAYS[dt.getDay()]}, ${MONTHS[m - 1]} ${d}`;
+  return isToday ? `Today · ${label}` : label;
+}
+
 export function DayPlanner() {
   const [selectedDate, setSelectedDate] = useState(() => dateKey());
   const [selectedBlockId, setSelectedBlockId] = useState<string | null>(null);
@@ -77,15 +108,11 @@ export function DayPlanner() {
     isToday && plan.blocks.length === 0 && nowMinutes < 10 * 60;
 
   return (
-    <div className="flex h-dvh flex-col overflow-hidden bg-[var(--paid-bg)] text-[var(--paid-fg)]">
-      <header className="z-40 flex shrink-0 flex-wrap items-center justify-between gap-3 border-b border-[var(--paid-border)] bg-[var(--paid-bar)] px-4 py-3">
-        <div className="flex items-center gap-3">
-          <h1 className="text-lg font-bold tracking-tight">
-            <span className="text-[var(--paid-accent)]">Paid</span>
-          </h1>
-          <p className="hidden text-xs text-[var(--paid-muted)] sm:block">
-            Morning work planner
-          </p>
+    <div className="desk flex h-dvh flex-col overflow-hidden text-[var(--paid-fg)]">
+      <header className="masthead z-40 flex shrink-0 flex-wrap items-center justify-between gap-3 px-4 py-2.5">
+        <div className="flex items-baseline gap-3">
+          <h1 className="wordmark">Paid</h1>
+          <p className="kicker hidden sm:block">Morning work planner</p>
         </div>
         <div className="flex flex-wrap items-center gap-3">
           <input
@@ -95,13 +122,9 @@ export function DayPlanner() {
               setSelectedDate(e.target.value);
               setSelectedBlockId(null);
             }}
-            className="editor-input rounded-md px-2 py-1.5 text-sm"
+            className="editor-input px-2 py-1.5 text-sm"
           />
-          {isToday && (
-            <span className="font-mono text-sm text-[var(--paid-muted)]">
-              {clock}
-            </span>
-          )}
+          {isToday && <span className="clock">{clock}</span>}
           <ThemeToggle
             themeId={themeId}
             onSelect={selectTheme}
@@ -111,8 +134,8 @@ export function DayPlanner() {
       </header>
 
       {showMorningBanner && (
-        <div className="morning-banner mx-4 mt-4 rounded-lg border border-[var(--paid-border)] bg-[var(--paid-surface)] px-4 py-3">
-          <p className="text-sm font-medium">Plan your starting blocks</p>
+        <div className="morning-slip mx-4 mt-3 px-4 py-3">
+          <p className="text-sm font-semibold">Plan your starting blocks</p>
           <p className="mt-1 text-xs text-[var(--paid-muted)]">
             Set your base, then quick-add blocks — or click the timeline.
           </p>
@@ -120,10 +143,10 @@ export function DayPlanner() {
       )}
 
       <main className="flex min-h-0 flex-1 flex-col gap-4 overflow-hidden p-4 lg:flex-row">
-        <section className="flex min-h-0 flex-1 flex-col gap-3 overflow-hidden lg:min-h-0">
-          <div className="flex items-center justify-between">
-            <h2 className="text-sm font-semibold">
-              {isToday ? "Today" : selectedDate}
+        <section className="flex min-h-0 flex-1 flex-col gap-2 overflow-hidden lg:min-h-0">
+          <div className="flex items-baseline justify-between gap-3">
+            <h2 className="font-[family-name:var(--font-newsreader)] text-lg font-semibold tracking-tight">
+              {dayHeading(selectedDate, isToday)}
             </h2>
             <span className="text-xs text-[var(--paid-muted)]">
               {plan.blocks.length} block{plan.blocks.length === 1 ? "" : "s"} ·{" "}
@@ -142,7 +165,7 @@ export function DayPlanner() {
           />
         </section>
 
-        <aside className="flex w-full shrink-0 flex-col gap-4 overflow-y-auto lg:w-80 lg:max-h-full">
+        <aside className="flex w-full shrink-0 flex-col gap-3 overflow-y-auto lg:w-72 lg:max-h-full">
           <BlockEditor
             block={selectedBlock}
             base={base}
@@ -155,14 +178,14 @@ export function DayPlanner() {
             onClose={() => setSelectedBlockId(null)}
           />
 
-          <div className="panel rounded-lg border border-[var(--paid-border)] bg-[var(--paid-panel)] p-4">
-            <h3 className="mb-2 text-sm font-semibold">Quick add</h3>
+          <div className="sheet p-3">
+            <h3 className="kicker mb-2">Quick add</h3>
             <div className="flex flex-wrap gap-2">
               {QUICK_MULTIPLIERS.map(({ multiplier, duration }) => (
                 <button
                   key={multiplier}
                   type="button"
-                  className="quick-add-btn rounded-md px-3 py-1.5 text-xs font-medium font-mono"
+                  className="quick-add-btn px-3 py-1.5 text-xs font-medium"
                   onClick={() => handleQuickAdd(multiplier, duration)}
                   title={`${multiplier}x base · ${duration}m`}
                 >
@@ -172,26 +195,26 @@ export function DayPlanner() {
             </div>
           </div>
 
-          <label className="panel flex flex-col gap-2 rounded-lg border border-[var(--paid-border)] bg-[var(--paid-panel)] p-4">
-            <span className="text-sm font-semibold">Morning note</span>
+          <label className="sheet flex flex-col gap-2 p-3">
+            <span className="kicker">Morning note</span>
             <textarea
               value={plan.morningNote}
               onChange={(e) => updatePlan({ morningNote: e.target.value })}
               placeholder="Intentions, priorities, first task…"
               rows={4}
-              className="editor-input resize-none rounded-md px-3 py-2 text-sm"
+              className="editor-input morning-note resize-none px-3 py-2 text-sm"
             />
           </label>
 
           {plan.blocks.length > 0 && (
-            <div className="panel rounded-lg border border-[var(--paid-border)] bg-[var(--paid-panel)] p-4">
-              <h3 className="mb-2 text-sm font-semibold">Agenda</h3>
+            <div className="sheet p-3">
+              <h3 className="kicker mb-2">Agenda</h3>
               <ul className="space-y-2">
                 {plan.blocks.map((b) => (
                   <li key={b.id}>
                     <button
                       type="button"
-                      className="flex w-full items-center gap-2 text-left text-xs hover:text-[var(--paid-accent)]"
+                      className="flex w-full items-center gap-2 text-left text-xs hover:text-[var(--paid-accent-hover)]"
                       onClick={() => setSelectedBlockId(b.id)}
                     >
                       <span
@@ -200,7 +223,7 @@ export function DayPlanner() {
                           background: `var(--paid-block-${b.colorIndex % 5})`,
                         }}
                       />
-                      <span className="font-mono text-[var(--paid-muted)]">
+                      <span className="font-[family-name:var(--font-source-code)] text-[var(--paid-muted)]">
                         {formatMinutes(b.startMinutes)}
                       </span>
                       <span className="truncate">{b.title}</span>

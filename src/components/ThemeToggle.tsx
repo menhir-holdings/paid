@@ -12,24 +12,23 @@ export function ThemeToggle({ themeId, onSelect, onCycle }: Props) {
   const current = THEMES.find((t) => t.id === themeId);
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="theme-toggle">
       <button
         type="button"
         onClick={onCycle}
-        className="theme-cycle-btn flex items-center gap-2 rounded-md px-3 py-1.5 text-sm font-medium transition-colors"
+        className="theme-cycle-btn"
         title="Cycle Rob Ross IDE theme"
+        aria-label={`Theme ${current?.label ?? ""}`}
       >
         <span
-          className="inline-block h-3 w-3 rounded-full ring-1 ring-[var(--paid-border)]"
+          className="theme-swatch"
           style={{ background: current?.accent }}
         />
-        <span className="hidden sm:inline">{current?.label}</span>
-        <span className="sm:hidden">Theme</span>
       </button>
       <select
         value={themeId}
         onChange={(e) => onSelect(e.target.value as ThemeId)}
-        className="theme-select rounded-md px-2 py-1.5 text-xs sm:text-sm"
+        className="theme-select px-2 py-1.5 text-xs sm:text-sm"
         aria-label="Select theme"
       >
         {THEMES.map((t) => (

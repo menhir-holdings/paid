@@ -38,16 +38,16 @@ export function BlockEditor({
 
   if (!block) {
     return (
-      <div className="panel rounded-lg border border-[var(--paid-border)] bg-[var(--paid-panel)] p-3">
+      <div className="sheet p-3">
         <label className="flex flex-col gap-1">
-          <span className="text-xs font-semibold text-[var(--paid-fg)]">Base</span>
+          <span className="kicker">Base</span>
           <input
             type="number"
             min={1}
             step={1}
             value={base}
             onChange={(e) => onBaseChange(e.target.value)}
-            className="editor-input rounded-md px-3 py-2 text-sm font-mono"
+            className="editor-input px-3 py-2 text-sm font-[family-name:var(--font-source-code)]"
             placeholder={String(DEFAULT_BASE)}
           />
         </label>
@@ -61,9 +61,9 @@ export function BlockEditor({
   const durationOptions = [15, 30, 45, 60, 90, 120];
 
   return (
-    <div className="panel flex flex-col gap-4 rounded-lg border border-[var(--paid-border)] bg-[var(--paid-panel)] p-4">
+    <div className="sheet flex flex-col gap-4 p-3">
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-semibold text-[var(--paid-fg)]">Edit block</h3>
+        <h3 className="kicker">Edit block</h3>
         <button
           type="button"
           onClick={onClose}
@@ -80,7 +80,7 @@ export function BlockEditor({
           type="text"
           value={block.title}
           onChange={(e) => onUpdate(block.id, { title: e.target.value })}
-          className="editor-input rounded-md px-3 py-2 text-sm"
+          className="editor-input px-3 py-2 text-sm"
         />
       </label>
 
@@ -97,7 +97,7 @@ export function BlockEditor({
                 endMinutes: Math.min(WORK_END, start + duration),
               });
             }}
-            className="editor-input rounded-md px-2 py-2 text-sm"
+            className="editor-input px-2 py-2 text-sm"
           >
             {timeOptions().map((m) => (
               <option key={m} value={m}>
@@ -113,7 +113,7 @@ export function BlockEditor({
             onChange={(e) =>
               onUpdate(block.id, { endMinutes: Number(e.target.value) })
             }
-            className="editor-input rounded-md px-2 py-2 text-sm"
+            className="editor-input px-2 py-2 text-sm"
           >
             {timeOptions()
               .filter((m) => m > block.startMinutes)
@@ -133,7 +133,7 @@ export function BlockEditor({
             <button
               key={d}
               type="button"
-              className="duration-chip rounded px-2 py-1 text-xs"
+              className="duration-chip px-2 py-1 text-xs"
               onClick={() =>
                 onUpdate(block.id, {
                   endMinutes: Math.min(WORK_END, block.startMinutes + d),
@@ -169,7 +169,7 @@ export function BlockEditor({
       <button
         type="button"
         onClick={() => onRemove(block.id)}
-        className="mt-2 rounded-md border border-[var(--paid-border)] px-3 py-2 text-xs text-[var(--paid-muted)] transition-colors hover:border-red-500/50 hover:text-red-400"
+        className="remove-block mt-1 px-3 py-2 text-xs"
       >
         Remove block
       </button>
