@@ -1,25 +1,27 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Source_Sans_3, Source_Serif_4 } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const sourceSans = Source_Sans_3({
+  variable: "--font-source-sans",
   subsets: ["latin"],
+  display: "swap",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const sourceSerif = Source_Serif_4({
+  variable: "--font-source-serif",
   subsets: ["latin"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "Paid — Morning work planner",
+  title: "Paid — Today’s billed work",
   description:
-    "Plan your starting work-day blocks when you arrive. Personal calendar with Rob Ross IDE themes.",
+    "Sit down, see the now-line, name a block, multiply by rate, see billed vs leftover.",
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0D1112",
+  themeColor: "#f3e6c4",
 };
 
 export default function RootLayout({
@@ -28,9 +30,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" data-theme="night-siren" data-mode="dark">
+    <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${sourceSans.variable} ${sourceSerif.variable} antialiased`}
       >
         {children}
       </body>

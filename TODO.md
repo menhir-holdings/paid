@@ -8,10 +8,11 @@ Linear: [Paid project](https://linear.app/menhir-holdings/project/paid-7842cd6c-
 
 ## Open
 
+- [MT-214](https://linear.app/menhir-holdings/issue/MT-214) — Billed-day desk, kill Rob Ross themes
 - [MT-20](https://linear.app/menhir-holdings/issue/MT-20) — Share-link length budget
 - [MT-21](https://linear.app/menhir-holdings/issue/MT-21) — Print-minded layout
 - [MT-23](https://linear.app/menhir-holdings/issue/MT-23) — Guide notes field polish
 
 ## Superseded
 
-MT-22, MT-24 (invoice/PDF) — product is the morning planner, not invoicing.
+MT-22, MT-24 (invoice/PDF) — product is billed-day work, not invoicing.

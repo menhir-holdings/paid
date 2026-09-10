@@ -1,57 +1,77 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { BlockEditor } from "@/components/BlockEditor";
-import { ThemeToggle } from "@/components/ThemeToggle";
-import { TimeGrid } from "@/components/TimeGrid";
+import { useCallback, useEffect, useState } from "react";
+import { DayStrip } from "@/components/DayStrip";
+import { Ledger, type Composer } from "@/components/Ledger";
 import { useBase } from "@/hooks/useBase";
 import { usePlanner } from "@/hooks/usePlanner";
-import { useTheme } from "@/hooks/useTheme";
 import {
+  billedAmount,
+  billedMinutes,
   dateKey,
+  DEFAULT_HOURS,
+  dropLegacyTheme,
+  formatHoursPhrase,
+  formatMoney,
+  leftoverAmount,
+  leftoverMinutes,
   formatMinutes,
   minutesFromMidnight,
-  QUICK_MULTIPLIERS,
-  quickAddLabel,
-  totalPlannedMinutes,
+  minutesToHoursCell,
+  parseHoursInput,
+  snapDuration,
 } from "@/lib/planner";
+
+const WEEKDAYS = [
+  "Sunday",
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+];
+const MONTHS = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+];
+
+function dayHeading(iso: string, isToday: boolean): string {
+  const [y, m, d] = iso.split("-").map(Number);
+  const dt = new Date(y, m - 1, d);
+  const label = `${WEEKDAYS[dt.getDay()]}, ${MONTHS[m - 1]} ${d}`;
+  return isToday ? `Today · ${label}` : label;
+}
 
 export function DayPlanner() {
   const [selectedDate, setSelectedDate] = useState(() => dateKey());
   const [selectedBlockId, setSelectedBlockId] = useState<string | null>(null);
   const [nowMinutes, setNowMinutes] = useState(0);
   const [clock, setClock] = useState("");
+  const [composer, setComposer] = useState<Composer>({
+    who: "",
+    hours: minutesToHoursCell(DEFAULT_HOURS * 60),
+    startMinutes: null,
+  });
+  const [placeError, setPlaceError] = useState<string | null>(null);
 
-  const { themeId, cycleTheme, selectTheme } = useTheme();
   const { base, updateBase } = useBase();
-  const {
-    plan,
-    updatePlan,
-    updateBlock,
-    removeBlock,
-    addQuickBlock,
-    addBlockAtSlot,
-  } = usePlanner(selectedDate);
+  const { plan, updateBlock, removeBlock, addNamedBlock } =
+    usePlanner(selectedDate);
 
-  const selectNewBlock = useCallback((id: string | null) => {
-    if (id) setSelectedBlockId(id);
+  useEffect(() => {
+    dropLegacyTheme();
   }, []);
-
-  const handleAddAtSlot = useCallback(
-    (slotMinutes: number) => {
-      const id = addBlockAtSlot(slotMinutes, base);
-      selectNewBlock(id);
-    },
-    [addBlockAtSlot, base, selectNewBlock],
-  );
-
-  const handleQuickAdd = useCallback(
-    (multiplier: number, duration: number) => {
-      const id = addQuickBlock(base, multiplier, duration);
-      selectNewBlock(id);
-    },
-    [addQuickBlock, base, selectNewBlock],
-  );
 
   useEffect(() => {
     const tick = () => {
@@ -62,156 +82,165 @@ export function DayPlanner() {
       );
     };
     tick();
-    const id = setInterval(tick, 30_000);
+    const id = setInterval(tick, 15_000);
     return () => clearInterval(id);
   }, []);
 
-  const selectedBlock = useMemo(
-    () => plan.blocks.find((b) => b.id === selectedBlockId) ?? null,
-    [plan.blocks, selectedBlockId],
-  );
-
   const isToday = selectedDate === dateKey();
-  const plannedMins = totalPlannedMinutes(plan.blocks);
-  const showMorningBanner =
-    isToday && plan.blocks.length === 0 && nowMinutes < 10 * 60;
+  const billedMins = billedMinutes(plan.blocks);
+  const leftMins = leftoverMinutes(plan.blocks);
+  const billed$ = billedAmount(plan.blocks, base);
+  const left$ = leftoverAmount(plan.blocks, base);
+  const openMins = billedMins + Math.max(leftMins, 0);
+  const fillPct = openMins === 0 ? 0 : Math.min(100, (billedMins / openMins) * 100);
+
+  const handleComposerChange = useCallback((patch: Partial<Composer>) => {
+    setPlaceError(null);
+    setComposer((prev) => ({ ...prev, ...patch }));
+  }, []);
+
+  const handleAdd = useCallback(() => {
+    const parsed = parseHoursInput(composer.hours);
+    if (!parsed) {
+      setPlaceError("Enter hours as 1, 1.5, or 1:30.");
+      return;
+    }
+    const duration = snapDuration(parsed);
+    const id = addNamedBlock(
+      composer.who,
+      duration,
+      composer.startMinutes ?? undefined,
+    );
+    if (!id) {
+      setPlaceError(
+        composer.who.trim()
+          ? "No open time left on the day."
+          : "Name who this block is for.",
+      );
+      return;
+    }
+    setComposer({
+      who: "",
+      hours: minutesToHoursCell(DEFAULT_HOURS * 60),
+      startMinutes: null,
+    });
+    setPlaceError(null);
+    setSelectedBlockId(null);
+  }, [addNamedBlock, composer]);
+
+  const handlePickHour = useCallback((minutes: number) => {
+    setSelectedBlockId(null);
+    setPlaceError(null);
+    setComposer((prev) => ({ ...prev, startMinutes: minutes }));
+  }, []);
+
+  const startHint =
+    composer.startMinutes === null
+      ? null
+      : `Starts ${formatMinutes(composer.startMinutes)}`;
 
   return (
-    <div className="flex h-dvh flex-col overflow-hidden bg-[var(--paid-bg)] text-[var(--paid-fg)]">
-      <header className="z-40 flex shrink-0 flex-wrap items-center justify-between gap-3 border-b border-[var(--paid-border)] bg-[var(--paid-bar)] px-4 py-3">
-        <div className="flex items-center gap-3">
-          <h1 className="text-lg font-bold tracking-tight">
-            <span className="text-[var(--paid-accent)]">Paid</span>
-          </h1>
-          <p className="hidden text-xs text-[var(--paid-muted)] sm:block">
-            Morning work planner
-          </p>
-        </div>
-        <div className="flex flex-wrap items-center gap-3">
-          <input
-            type="date"
-            value={selectedDate}
-            onChange={(e) => {
-              setSelectedDate(e.target.value);
-              setSelectedBlockId(null);
-            }}
-            className="editor-input rounded-md px-2 py-1.5 text-sm"
-          />
-          {isToday && (
-            <span className="font-mono text-sm text-[var(--paid-muted)]">
-              {clock}
-            </span>
-          )}
-          <ThemeToggle
-            themeId={themeId}
-            onSelect={selectTheme}
-            onCycle={cycleTheme}
-          />
-        </div>
-      </header>
-
-      {showMorningBanner && (
-        <div className="morning-banner mx-4 mt-4 rounded-lg border border-[var(--paid-border)] bg-[var(--paid-surface)] px-4 py-3">
-          <p className="text-sm font-medium">Plan your starting blocks</p>
-          <p className="mt-1 text-xs text-[var(--paid-muted)]">
-            Set your base, then quick-add blocks — or click the timeline.
-          </p>
-        </div>
-      )}
-
-      <main className="flex min-h-0 flex-1 flex-col gap-4 overflow-hidden p-4 lg:flex-row">
-        <section className="flex min-h-0 flex-1 flex-col gap-3 overflow-hidden lg:min-h-0">
-          <div className="flex items-center justify-between">
-            <h2 className="text-sm font-semibold">
-              {isToday ? "Today" : selectedDate}
-            </h2>
-            <span className="text-xs text-[var(--paid-muted)]">
-              {plan.blocks.length} block{plan.blocks.length === 1 ? "" : "s"} ·{" "}
-              {plannedMins >= 60
-                ? `${Math.floor(plannedMins / 60)}h${plannedMins % 60 ? ` ${plannedMins % 60}m` : ""}`
-                : `${plannedMins}m`}{" "}
-              planned
-            </span>
+    <div className="desk">
+      <article className="sheet">
+        <header className="sheet-head">
+          <div>
+            <p className="kicker">Today’s billed work</p>
+            <h1 className="wordmark">Paid</h1>
           </div>
-          <TimeGrid
-            blocks={plan.blocks}
-            nowMinutes={isToday ? nowMinutes : -1}
-            selectedBlockId={selectedBlockId}
-            onSelectBlock={setSelectedBlockId}
-            onAddAtSlot={handleAddAtSlot}
-          />
+          <div className="sheet-meta">
+            <label className="date-field">
+              <span className="sr-only">Date</span>
+              <input
+                type="date"
+                value={selectedDate}
+                onChange={(e) => {
+                  setSelectedDate(e.target.value);
+                  setSelectedBlockId(null);
+                }}
+                className="editor-input"
+              />
+            </label>
+            {isToday && <span className="clock">{clock}</span>}
+          </div>
+        </header>
+
+        <p className="day-title">{dayHeading(selectedDate, isToday)}</p>
+
+        <section className="tally" aria-live="polite">
+          <div>
+            <p className="kicker">Billed</p>
+            <p className="tally-figure money">{formatMoney(billed$)}</p>
+            <p className="tally-sub">{formatHoursPhrase(billedMins)}</p>
+          </div>
+          <div>
+            <p className="kicker">Leftover</p>
+            <p className="tally-figure">
+              {formatHoursPhrase(leftMins)}
+              {leftMins > 0 ? (
+                <span className="tally-sub-inline">
+                  {" "}
+                  · {formatMoney(left$)}
+                </span>
+              ) : null}
+            </p>
+            <p className="tally-sub">
+              {leftMins < 0
+                ? "Past the paper day"
+                : `${formatMoney(Math.max(0, left$))} still open`}
+            </p>
+          </div>
         </section>
 
-        <aside className="flex w-full shrink-0 flex-col gap-4 overflow-y-auto lg:w-80 lg:max-h-full">
-          <BlockEditor
-            block={selectedBlock}
-            base={base}
-            onBaseChange={updateBase}
-            onUpdate={updateBlock}
-            onRemove={(id) => {
-              removeBlock(id);
-              setSelectedBlockId(null);
-            }}
-            onClose={() => setSelectedBlockId(null)}
+        <div
+          className="tally-rule"
+          role="presentation"
+          title={`${Math.round(fillPct)}% billed`}
+        >
+          <span style={{ width: `${fillPct}%` }} />
+        </div>
+
+        <label className="rate-field">
+          <span>Rate</span>
+          <span className="rate-prefix">$</span>
+          <input
+            type="number"
+            min={1}
+            step={1}
+            value={base}
+            onChange={(e) => updateBase(e.target.value)}
+            className="editor-input hours-input"
+            aria-label="Hourly rate"
           />
+          <span className="rate-suffix">/ h</span>
+        </label>
 
-          <div className="panel rounded-lg border border-[var(--paid-border)] bg-[var(--paid-panel)] p-4">
-            <h3 className="mb-2 text-sm font-semibold">Quick add</h3>
-            <div className="flex flex-wrap gap-2">
-              {QUICK_MULTIPLIERS.map(({ multiplier, duration }) => (
-                <button
-                  key={multiplier}
-                  type="button"
-                  className="quick-add-btn rounded-md px-3 py-1.5 text-xs font-medium font-mono"
-                  onClick={() => handleQuickAdd(multiplier, duration)}
-                  title={`${multiplier}x base · ${duration}m`}
-                >
-                  {quickAddLabel(base, multiplier)}
-                </button>
-              ))}
-            </div>
-          </div>
+        <DayStrip
+          blocks={plan.blocks}
+          nowMinutes={isToday ? nowMinutes : -1}
+          selectedBlockId={selectedBlockId}
+          onSelectBlock={setSelectedBlockId}
+          onPickHour={handlePickHour}
+        />
 
-          <label className="panel flex flex-col gap-2 rounded-lg border border-[var(--paid-border)] bg-[var(--paid-panel)] p-4">
-            <span className="text-sm font-semibold">Morning note</span>
-            <textarea
-              value={plan.morningNote}
-              onChange={(e) => updatePlan({ morningNote: e.target.value })}
-              placeholder="Intentions, priorities, first task…"
-              rows={4}
-              className="editor-input resize-none rounded-md px-3 py-2 text-sm"
-            />
-          </label>
+        {startHint && <p className="start-hint">{startHint}</p>}
 
-          {plan.blocks.length > 0 && (
-            <div className="panel rounded-lg border border-[var(--paid-border)] bg-[var(--paid-panel)] p-4">
-              <h3 className="mb-2 text-sm font-semibold">Agenda</h3>
-              <ul className="space-y-2">
-                {plan.blocks.map((b) => (
-                  <li key={b.id}>
-                    <button
-                      type="button"
-                      className="flex w-full items-center gap-2 text-left text-xs hover:text-[var(--paid-accent)]"
-                      onClick={() => setSelectedBlockId(b.id)}
-                    >
-                      <span
-                        className="h-2 w-2 shrink-0 rounded-full"
-                        style={{
-                          background: `var(--paid-block-${b.colorIndex % 5})`,
-                        }}
-                      />
-                      <span className="font-mono text-[var(--paid-muted)]">
-                        {formatMinutes(b.startMinutes)}
-                      </span>
-                      <span className="truncate">{b.title}</span>
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-        </aside>
-      </main>
+        <Ledger
+          blocks={plan.blocks}
+          rate={base}
+          selectedBlockId={selectedBlockId}
+          composer={composer}
+          onSelectBlock={setSelectedBlockId}
+          onComposerChange={handleComposerChange}
+          onAdd={handleAdd}
+          onUpdate={updateBlock}
+          onRemove={(id) => {
+            removeBlock(id);
+            setSelectedBlockId(null);
+          }}
+        />
+
+        {placeError && <p className="place-error">{placeError}</p>}
+      </article>
     </div>
   );
 }
