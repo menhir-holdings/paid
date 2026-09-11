@@ -1,6 +1,6 @@
 # Paid — Agent guide
 
-Today’s billed work. One paper ledger: now-line, named blocks (who + hours), rate, billed vs leftover. Browser `localStorage` (`paid-planner-v1`, `paid-base-v1`). Drop `paid-theme-v1` on load. Redeploys do not wipe planner/rate data.
+Today’s billed work. Timesheet desk: now-line, named blocks (who + hours), rate, billed vs leftover. Browser `localStorage` (`paid-planner-v1`, `paid-base-v1`). Drop `paid-theme-v1` on load. Redeploys do not wipe planner/rate data.
 
 ## Commands
 

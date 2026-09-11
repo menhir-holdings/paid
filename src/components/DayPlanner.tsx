@@ -185,7 +185,7 @@ export function DayPlanner() {
             </p>
             <p className="tally-sub">
               {leftMins < 0
-                ? "Past the paper day"
+                ? "Past billed hours"
                 : `${formatMoney(Math.max(0, left$))} still open`}
             </p>
           </div>

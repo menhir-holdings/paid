@@ -8,6 +8,7 @@ Linear: [Paid project](https://linear.app/menhir-holdings/project/paid-7842cd6c-
 
 ## Open
 
+- [MT-222](https://linear.app/menhir-holdings/issue/MT-222) — Corporate billable calendar chrome (kill worn paper)
 - [MT-214](https://linear.app/menhir-holdings/issue/MT-214) — Billed-day desk, kill Rob Ross themes
 - [MT-20](https://linear.app/menhir-holdings/issue/MT-20) — Share-link length budget
 - [MT-21](https://linear.app/menhir-holdings/issue/MT-21) — Print-minded layout

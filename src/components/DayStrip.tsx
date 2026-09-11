@@ -6,7 +6,7 @@ import {
   hourLabel,
   minutesToHoursCell,
   nowChip,
-  WORK_END,
+  OVERTIME_END,
   WORK_START,
   type TimeBlock,
 } from "@/lib/planner";
@@ -22,7 +22,8 @@ type Props = {
 const HOUR_PX = 40;
 const LABEL_WIDTH = 56;
 const PX_PER_MIN = HOUR_PX / 60;
-const TOTAL = WORK_END - WORK_START;
+const DISPLAY_END = OVERTIME_END;
+const TOTAL = DISPLAY_END - WORK_START;
 
 function slotTop(minutes: number): number {
   return (minutes - WORK_START) * PX_PER_MIN;
@@ -30,7 +31,7 @@ function slotTop(minutes: number): number {
 
 function visibleSpan(block: TimeBlock): { top: number; height: number } | null {
   const start = Math.max(block.startMinutes, WORK_START);
-  const end = Math.min(block.endMinutes, WORK_END);
+  const end = Math.min(block.endMinutes, DISPLAY_END);
   if (end <= start) return null;
   return {
     top: slotTop(start),
@@ -47,9 +48,10 @@ export function DayStrip({
 }: Props) {
   const nowRef = useRef<HTMLDivElement>(null);
   const hours: number[] = [];
-  for (let m = WORK_START; m < WORK_END; m += 60) hours.push(m);
+  for (let m = WORK_START; m < DISPLAY_END; m += 60) hours.push(m);
 
-  const showNow = nowMinutes >= WORK_START && nowMinutes <= WORK_END;
+  const showNow = nowMinutes >= WORK_START;
+  const nowTop = slotTop(Math.min(nowMinutes, DISPLAY_END));
   const gridHeight = TOTAL * PX_PER_MIN;
 
   useEffect(() => {
@@ -124,7 +126,7 @@ export function DayStrip({
           <div
             ref={nowRef}
             className="now-line"
-            style={{ top: slotTop(nowMinutes) }}
+            style={{ top: nowTop }}
           >
             <span className="sr-only">Now {nowChip(nowMinutes)}</span>
             <span className="now-chip" aria-hidden="true">

@@ -13,7 +13,7 @@ import {
   minutesToHoursCell,
   parseHoursInput,
   snapDuration,
-  WORK_END,
+  OVERTIME_END,
   WORK_START,
   type TimeBlock,
 } from "@/lib/planner";
@@ -233,6 +233,6 @@ export function Ledger({
 
 function startOptions(): number[] {
   const out: number[] = [];
-  for (let m = WORK_START; m < WORK_END; m += 30) out.push(m);
+  for (let m = WORK_START; m < OVERTIME_END; m += 30) out.push(m);
   return out;
 }
