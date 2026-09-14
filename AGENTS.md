@@ -1,21 +1,20 @@
 # Paid — Agent guide
 
-Morning work-day planner. Data in browser `localStorage` (`paid-planner-v1`, `paid-base-v1`, `paid-theme-v1`). Redeploys do not wipe user data.
+Today’s billed work. Timesheet desk: now-line, named blocks (who + hours), rate, billed vs leftover. Browser `localStorage` (`paid-planner-v1`, `paid-base-v1`). Drop `paid-theme-v1` on load. Redeploys do not wipe planner/rate data.
 
 ## Commands
 
 ```bash
 npm run dev
 npm run build
-npm run vercel:prod
 ```
+
+Preview deploys: `npx vercel@54 deploy --yes --scope menhir-holdings` (Hobby cannot GitHub-deploy this private repo). Do not `--prod` unless asked.
 
 ## GitHub / Vercel
 
-- Repo: `ledoit/paid` — hook-up via `~/work/scripts/work-new-repo.sh Menhir/Job/Paid`
-- Vercel project: `menhir-tech/paid` — production deploys via Git push (after `vercel git connect`) or `npm run vercel:prod` locally
-
-See `~/work/AGENTS.md` for the new-project agent flow.
+- Repo: `menhir-holdings/paid`
+- Bookmark: [https://paid-menhir-holdings.vercel.app](https://paid-menhir-holdings.vercel.app)
 
 <!-- BEGIN:nextjs-agent-rules -->
 # This is NOT the Next.js you know

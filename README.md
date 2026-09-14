@@ -1,15 +1,6 @@
 # Paid
 
-Personal morning work-day planner. Map time blocks when you arrive at work — stored locally in your browser.
-
-Themes are compiled from the shared **Rob Ross** genome — [`Menhir Holdings/Color/Rob-Ross`](../../Color/Rob-Ross/) ([github.com/ledoit/Rob-Ross](https://github.com/ledoit/Rob-Ross)).
-
-After keeping IDE palettes there, sync into this app:
-
-```bash
-cd "../../Color/Rob-Ross"
-python cli.py web sync paid
-```
+Today’s billed work. Sit down, see the now-line, name a block (who + hours), multiply by rate, see billed vs leftover. Stored locally in the browser.
 
 ## Local dev
 
@@ -20,18 +11,17 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000).
 
-## Deploy (Vercel)
+## Deploy
 
-Project name: **Paid**
+Bookmark: [https://paid-menhir-holdings.vercel.app](https://paid-menhir-holdings.vercel.app)
+
+Hobby cannot GitHub-deploy this private repo. Preview with:
 
 ```bash
-npx vercel link    # name the project "Paid" when prompted
-npm run build
-npx vercel --prod
+npx vercel@54 deploy --yes --scope menhir-holdings
 ```
 
 Plans persist in `localStorage` only — no backend, no accounts.
-
 
 ## License
 

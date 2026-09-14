@@ -1,25 +1,21 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Source_Sans_3 } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const sourceSans = Source_Sans_3({
+  variable: "--font-source-sans",
   subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "Paid — Morning work planner",
+  title: "Paid — Today’s billed work",
   description:
-    "Plan your starting work-day blocks when you arrive. Personal calendar with Rob Ross IDE themes.",
+    "Sit down, see the now-line, name a block, multiply by rate, see billed vs leftover.",
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0D1112",
+  themeColor: "#e8edf2",
 };
 
 export default function RootLayout({
@@ -28,12 +24,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" data-theme="night-siren" data-mode="dark">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
-      </body>
+    <html lang="en">
+      <body className={`${sourceSans.variable} antialiased`}>{children}</body>
     </html>
   );
 }
