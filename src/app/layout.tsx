@@ -12,6 +12,7 @@ export const metadata: Metadata = {
   title: "Paid — Today’s billed work",
   description:
     "Sit down, see the now-line, name a block, multiply by rate, see billed vs leftover.",
+  icons: { icon: [{ url: "/favicon.svg", type: "image/svg+xml" }] },
 };
 
 export const viewport: Viewport = {
